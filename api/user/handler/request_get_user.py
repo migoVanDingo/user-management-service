@@ -19,13 +19,15 @@ class RequestGetUser(AbstractHandler):
             dao_request = Request()
             get_user_response = dao_request.read(self.request_id, Constant.table["USER"], self.args)
 
-            if not get_user_response['response']:
+            if not get_user_response or not get_user_response['response']:
                 current_app.logger.error(f"{self.request_id} --- {self.__class__.__name__} --- User not found")
                 raise ThrowError(f"User not found", 404)
             
             current_app.logger.info(f"{self.request_id} --- {self.__class__.__name__} --- {get_user_response}")
 
-
+            # Remove hash from response
+            del get_user_response['response']['hash']
+            
             return get_user_response['response']
 
         except Exception as e:

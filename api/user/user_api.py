@@ -21,7 +21,7 @@ def create_user():
 # Read user
 @user_api.route('/user', methods=['GET'])
 def get_user():
-    args = request.args
+    args = request.args.to_dict()
     request_id = g.request_id
     api_request = RequestGetUser(request_id, args)
     response = api_request.do_process()
@@ -31,7 +31,7 @@ def get_user():
 # Get user list
 @user_api.route('/user/list', methods=['GET'])
 def get_user_list():
-    args = request.args
+    args = request.args.to_dict()
     request_id = g.request_id
     api_request = RequestGetUserList(request_id, args)
     response = api_request.do_process()
