@@ -22,12 +22,7 @@ class RequestGetUser(AbstractHandler):
             if not get_user_response or not get_user_response['response']:
                 current_app.logger.error(f"{self.request_id} --- {self.__class__.__name__} --- User not found")
                 raise ThrowError(f"User not found", 404)
-            
-            current_app.logger.info(f"{self.request_id} --- {self.__class__.__name__} --- {get_user_response}")
 
-            # Remove hash from response
-            del get_user_response['response']['hash']
-            
             return get_user_response['response']
 
         except Exception as e:
