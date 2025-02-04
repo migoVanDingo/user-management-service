@@ -1,3 +1,6 @@
+import random
+import secrets
+import string
 import bcrypt
 
 class UserUtils:
@@ -16,3 +19,18 @@ class UserUtils:
 
         # checking password 
         return bcrypt.checkpw(userBytes, hash)
+    
+    @staticmethod
+    def generate_plaintext_token(length: int = 25) -> str:
+        """
+        Generate a secure random plaintext token.
+
+        Args:
+            length (int): Length of the generated token (default is 25).
+
+        Returns:
+            str: Randomly generated plaintext token.
+        """
+        characters = string.ascii_letters + string.digits
+        token = ''.join(secrets.choice(characters) for _ in range(length))
+        return token

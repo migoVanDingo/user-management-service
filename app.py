@@ -4,6 +4,7 @@ import uuid
 
 from flask import Flask, g, jsonify, make_response, request
 from flask_cors import CORS
+from flask_wtf import CSRFProtect
 
 from utility.error import ThrowError
 
@@ -14,6 +15,9 @@ logging.basicConfig(filename='record.log',
 
 app = Flask(__name__)
 CORS(app)
+app.secret_key = 'your_secret_key_here'  # Replace with a secure secret key
+csrf = CSRFProtect(app)
+app.config['WTF_CSRF_ENABLED'] = False
 
 #register blueprints
 from api.user.user_api import user_api # type: ignore

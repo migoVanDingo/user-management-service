@@ -1,6 +1,8 @@
-from flask import Blueprint, g, json, request
+from flask import Blueprint, current_app, g, json, request
 
+from api.user_action.handler.request_register_user import RequestRegisterUser
 from api.user_action.handler.request_user_login import RequestUserLogin
+from api.user_action.handler.request_verify_user_account import RequestVerifyUserAccount
 
 user_action_api = Blueprint('user_action_api', __name__)
 
@@ -21,7 +23,22 @@ def logout():
 # User registration
 @user_action_api.route('/user/register', methods=['POST'])
 def register():
-    return "Not implemented"
+    current_app.logger.info(f"--- Request data: {request.data}")
+    data = json.loads(request.data)
+    request_id = g.request_id
+    api_request = RequestRegisterUser(request_id, data)
+    response = api_request.do_process()
+    return response
+
+
+# Verify User
+@user_action_api.route('/user/account/verify', methods=['GET'])
+def verify_user():
+    args = request.args.to_dict()
+    request_id = g.request_id
+    api_request = RequestVerifyUserAccount(request_id, args)
+    response = api_request.do_process()
+    return response
 
 # User update
 @user_action_api.route('/user', methods=['PUT'])
