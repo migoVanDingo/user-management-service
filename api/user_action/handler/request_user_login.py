@@ -6,6 +6,7 @@ from flask import current_app, jsonify, make_response
 from pydantic import BaseModel
 from api.user.handler.request_get_user import RequestGetUser
 from api.user.utils.user_utils import UserUtils
+from api.user_action.payload.payload_user_session import PayloadUserSession
 from classes.jwt import JWT
 from interface.abstract_handler import AbstractHandler
 from utility.error import ThrowError
@@ -58,8 +59,15 @@ class RequestUserLogin(AbstractHandler):
 
             # Generate tokens
             jwt = JWT()
-            access_token, refresh_token = jwt.generate_tokens(get_user_response['user_id'], user_role['role'])
+            tokens = jwt.generate_tokens(get_user_response['user_id'], user_role['role'])
 
+            access_token = tokens['access_token']
+            refresh_token = tokens['refresh_token']
+
+            # Insert refresh token in user_sessions table
+            response = dao_request.insert(self.request_id, "user_session", PayloadUserSession.form_user_session(get_user_response['user_id'], refresh_token))
+
+            current_app.logger.info(f"{self.request_id} --- {self.__class__.__name__} --- ACCESS_TOKEN: {access_token}")
             # Set refresh token in an HTTP-only secure cookie
             response = make_response(jsonify({"status": "SUCCESS", "user": get_user_response, "access_token": access_token}), 200)
             response.set_cookie(
@@ -68,8 +76,10 @@ class RequestUserLogin(AbstractHandler):
                 httponly=True,
                 secure=False if os.getenv("ENV") == "DEV" else True,
                 max_age=60 * 60 * 24 * 7,  # 7 days expiration
-                samesite="Strict"
+                samesite="Lax" if os.getenv("ENV") == "DEV" else "Strict",
             )
+            response.headers['Access-Control-Allow-Origin'] = "http://localhost:5173"
+            response.headers['Access-Control-Allow-Credentials'] = "true"
 
             return response
 
