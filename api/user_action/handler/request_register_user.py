@@ -20,9 +20,10 @@ class RequestRegisterUser(AbstractHandler):
     def do_process(self):
         try:
             current_app.logger.info(f"{self.request_id} --- {self.__class__.__name__} --- Request payload: {self.payload}")
-            form = RegistrationForm(data=self.payload)
-            if not form.validate():
-                return {"status": "FAILED", "error": form.errors}
+            # form = RegistrationForm(data=self.payload)
+            # if not form.validate():
+            #     current_app.logger.error(f"{self.request_id} --- {self.__class__.__name__} --- Payload Validation Error: {form.errors}")
+            #     return {"status": "FAILED", "error": form.errors}
             
             self.payload['user_id'] = self.generate_temp_user_id()
             

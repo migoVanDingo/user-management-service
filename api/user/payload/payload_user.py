@@ -8,11 +8,21 @@ class IInsertUser(BaseModel):
 class PayloadUser:
     @staticmethod
     def form_user_payload(data:dict) -> IInsertUser:
-        return {
+        payload =  {
             "username": data.get("username"),
-            "hash": data.get("hash"),
-            "email": data.get("email")
+            "email": data.get("email"),
+            "user_type": data.get("user_type")
         }
+        if "hash" in data:
+            payload["hash"] = data.get("hash")
+
+        if "github_id" in data:
+            payload["github_id"] = data.get("github_id")
+
+        return payload
+
+        
+
     
     @staticmethod
     def form_user_response(data:dict) -> dict:

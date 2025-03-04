@@ -1,6 +1,14 @@
+import os
+
+
 class Constant:
     service_port = 5014
     service = "user-management-service"
+
+    GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
+    GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+    GITHUB_REDIRECT_URI = "http://localhost:5014/api/github/callback"
+    SECRET_KEY = os.getenv("JWT_SECRET_KEY") 
 
     services = {
         "JOB": {

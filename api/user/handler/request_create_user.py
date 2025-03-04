@@ -20,10 +20,11 @@ class RequestCreateUser(AbstractHandler):
             current_app.logger.info(f"{self.request_id} --- {self.__class__.__name__} --- {self.payload}")
 
             # Hash password and remove it from payload
-            password = self.payload['password']
-            hash = UserUtils.hash_password(password)
-            self.payload['hash'] = hash
-            del self.payload['password']
+            if "password" in self.payload:
+                password = self.payload['password']
+                hash = UserUtils.hash_password(password)
+                self.payload['hash'] = hash
+                del self.payload['password']
 
 
             # Insert the user in the database

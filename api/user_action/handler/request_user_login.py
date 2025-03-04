@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from api.user.handler.request_get_user import RequestGetUser
 from api.user.utils.user_utils import UserUtils
 from api.user_action.payload.payload_user_session import PayloadUserSession
+from api.user_action.utils.user_action_utils import UserActionUtils
 from classes.jwt import JWT
 from interface.abstract_handler import AbstractHandler
 from utility.error import ThrowError
@@ -53,21 +54,13 @@ class RequestUserLogin(AbstractHandler):
             # Log user login
             current_app.logger.info(f"{self.request_id} --- User logged in: {get_user_response}")
 
-            # Fetch user role
+            access_token, refresh_token = UserActionUtils.generate_tokens(self.request_id, get_user_response)
+
+             # Insert refresh token in user_sessions table
             dao_request = Request()
-            user_role = dao_request.read(self.request_id, "user_roles", {"user_id": get_user_response['user_id']})['response']
-
-            # Generate tokens
-            jwt = JWT()
-            tokens = jwt.generate_tokens(get_user_response['user_id'], user_role['role'])
-
-            access_token = tokens['access_token']
-            refresh_token = tokens['refresh_token']
-
-            # Insert refresh token in user_sessions table
             response = dao_request.insert(self.request_id, "user_session", PayloadUserSession.form_user_session(get_user_response['user_id'], refresh_token))
 
-            current_app.logger.info(f"{self.request_id} --- {self.__class__.__name__} --- ACCESS_TOKEN: {access_token}")
+            current_app.logger.info(f"{self.request_id} --- {__class__.__name__} --- ACCESS_TOKEN: {access_token}")
             # Set refresh token in an HTTP-only secure cookie
             response = make_response(jsonify({"status": "SUCCESS", "user": get_user_response, "access_token": access_token}), 200)
             response.set_cookie(
@@ -82,6 +75,7 @@ class RequestUserLogin(AbstractHandler):
             response.headers['Access-Control-Allow-Credentials'] = "true"
 
             return response
+
 
         except Exception as e:
             current_app.logger.error(f"{self.request_id} --- {traceback.format_exc()} --- {str(e)}")

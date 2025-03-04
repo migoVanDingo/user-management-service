@@ -1,4 +1,4 @@
-from flask import Blueprint, g, json, request
+from flask import Blueprint, g, json, jsonify, request
 
 from api.user.handler.request_create_user import RequestCreateUser
 from api.user.handler.request_create_user_registration import RequestCreateUserRegistration
@@ -51,6 +51,7 @@ def create_user_registration():
         return { "status": response["status"], "data": res_data}
     
     return response
+
 
 # Read user
 @user_api.route('/user', methods=['GET'])

@@ -7,6 +7,7 @@ from flask_cors import CORS
 from flask_wtf import CSRFProtect
 
 from api.auth.auth_api import auth_api
+from api.github.github_api import github_api
 from utility.error import ThrowError
 
 
@@ -15,7 +16,7 @@ logging.basicConfig(filename='record.log',
                      format='%(asctime)s | %(levelname)s | %(lineno)d | \n %(message)-20s')
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["http://localhost:5173", "http://localhost:5017"])
+CORS(app, supports_credentials=True, origins=["http://localhost:5173", "http://localhost:5017", "https://github.com/login/oauth/authorize"])
 app.secret_key = 'your_secret_key_here'  # Replace with a secure secret key
 csrf = CSRFProtect(app)
 app.config['WTF_CSRF_ENABLED'] = False
@@ -26,6 +27,7 @@ from api.user_action.user_action_api import user_action_api # type: ignore
 app.register_blueprint(user_api, url_prefix='/api')
 app.register_blueprint(user_action_api, url_prefix='/api')
 app.register_blueprint(auth_api, url_prefix='/api')
+app.register_blueprint(github_api, url_prefix='/api')
 
 
 @app.before_request

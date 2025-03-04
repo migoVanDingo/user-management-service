@@ -12,10 +12,10 @@ class RegistrationForm(FlaskForm):
         ]
     )
     email = StringField('Email', validators=[InputRequired(), Email()])
-    password = PasswordField(
-        'Password',
-        validators=[
-            InputRequired(),
-            Length(min=4, message="Password must be at least 4 characters long."),
-        ]
-    )
+    # password = PasswordField(
+    #     'Password',
+    #     validators=[
+    #         InputRequired(),
+    #         Length(min=4, message="Password must be at least 4 characters long."),
+    #     ]
+    # )

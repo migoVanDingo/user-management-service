@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, json, request
+from flask import Blueprint, current_app, json, jsonify, request
 
 from classes.jwt import JWT
 
@@ -27,3 +27,11 @@ def decode_token():
 
     return response
 
+@auth_api.route("/auth/access_token", methods=["GET"])
+def get_access_token():
+    access_token = request.cookies.get("access_token")
+
+    if not access_token:
+        return jsonify({"error": "Access token not found"}), 401
+
+    return jsonify({"access_token": access_token})
