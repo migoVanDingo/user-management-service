@@ -66,6 +66,8 @@ def github_user():
 @github_api.route("/github/repos")
 def github_repos():
     """Fetch user's repositories."""
+
+    current_app.logger.info(f"Fetching user's Github repositories")
     access_token = session.get("github_token")
     if not access_token:
         return jsonify({"error": "Unauthorized"}), 401
@@ -73,5 +75,7 @@ def github_repos():
     repos_url = "https://api.github.com/user/repos"
     headers = {"Authorization": f"Bearer {access_token}"}
     response = requests.get(repos_url, headers=headers)
+
+    current_app.logger.info(f"Github Repos: {response.json()}")
 
     return jsonify(response.json())

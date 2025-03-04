@@ -37,7 +37,7 @@ class RequestHandleGithubCallback(AbstractHandler):
                 return jsonify({"error": "Failed to retrieve access token"}), 400
 
             access_token = data["access_token"]
-            session["github_token"] = access_token  # Store token in session
+            
 
             # Request fetch user profile
             request = RequestFetchGithubUser(self.request_id, access_token)
@@ -62,7 +62,8 @@ class RequestHandleGithubCallback(AbstractHandler):
             elif self.flow_type == "login":
                 current_app.logger.info(
                     f"{self.request_id} --- GITHUB_CALLBACK: login -- user: {github_user}")
-                return self._login_user(github_user)
+                github_token = access_token
+                return self._login_user(github_user, github_token)
 
         except Exception as e:
             current_app.logger.error(
@@ -82,7 +83,7 @@ class RequestHandleGithubCallback(AbstractHandler):
         response = api_request.do_process()
         return make_response(redirect("http://localhost:5173/login"))
 
-    def _login_user(self, github_user):
+    def _login_user(self, github_user, github_token):
         email = github_user["email"]
 
         # Get user
@@ -109,6 +110,15 @@ class RequestHandleGithubCallback(AbstractHandler):
             httponly=True,
             secure=False if os.getenv("ENV") == "DEV" else True,
             max_age=60 * 60 * 24 * 7,  # 7 days expiration
+            samesite="Lax" if os.getenv("ENV") == "DEV" else "Strict",
+        )
+
+        response.set_cookie(
+            key="github_token",
+            value=github_token,
+            httponly=True,
+            secure=False if os.getenv("ENV") == "DEV" else True,
+            max_age=60 * 60 * 8,  # 7 days expiration
             samesite="Lax" if os.getenv("ENV") == "DEV" else "Strict",
         )
         

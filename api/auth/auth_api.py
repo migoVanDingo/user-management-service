@@ -35,3 +35,13 @@ def get_access_token():
         return jsonify({"error": "Access token not found"}), 401
 
     return jsonify({"access_token": access_token})
+
+
+@auth_api.route("/auth/github_token", methods=["GET"])
+def get_github_token():
+    access_token = request.cookies.get("github_token")
+
+    if not access_token:
+        return jsonify({"error": "GitHub token not found"}), 401
+
+    return jsonify({"github_token": access_token})
